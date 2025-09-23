@@ -3,16 +3,18 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Plus,
-  Edit,
-  Trash2,
   Package2,
   Menu,
   X,
   Smartphone,
   BarChart3,
-  Users,
-  Settings,
   LogOut,
+  Users,
+  ShoppingCart,
+  TrendingUp,
+  Package,
+  FileBarChart,
+  PieChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -30,13 +32,15 @@ const Sidebar = ({ onLogout }: SidebarProps) => {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
     { name: "Add Stock", href: "/add-stock", icon: Plus, badge: null },
     { name: "View Inventory", href: "/inventory", icon: Package2, badge: "340" },
-    { name: "Update Stock", href: "/update-stock", icon: Edit, badge: null },
-    { name: "Reports", href: "/reports", icon: BarChart3, badge: "New" },
+    { name: "Suppliers", href: "/suppliers", icon: Users, badge: null },
+    { name: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart, badge: "3" },
+    { name: "Stock Tracking", href: "/stock-tracking", icon: Package, badge: null },
   ];
 
   const secondaryNav = [
-    { name: "Settings", href: "/settings", icon: Settings },
-    { name: "Support", href: "/support", icon: Users },
+    { name: "Reports", href: "/reports", icon: FileBarChart, badge: null },
+    { name: "Analytics", href: "/analytics", icon: PieChart, badge: "New" },
+    { name: "Valuation", href: "/valuation", icon: TrendingUp, badge: null },
   ];
 
   const getNavClass = (href: string) => {
