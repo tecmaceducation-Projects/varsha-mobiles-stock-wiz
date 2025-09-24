@@ -7,10 +7,12 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useInventory } from "@/contexts/InventoryContext";
 import { useSupplier } from "@/contexts/SupplierContext";
+import { useToast } from "@/hooks/use-toast";
 
 const Analytics = () => {
   const { mobileData } = useInventory();
-  const { stockMovements, purchaseOrders } = useSupplier();
+  const { stockMovements, purchaseOrders, suppliers, addPurchaseOrder } = useSupplier();
+  const { toast } = useToast();
   const [timeRange, setTimeRange] = useState("30");
 
   // Mock data for trends (in a real app, this would come from historical data)
@@ -43,6 +45,46 @@ const Analytics = () => {
     { category: "Mid-range (₹20k-₹80k)", sales: 78, percentage: 48 },
     { category: "Budget (<₹20k)", sales: 27, percentage: 17 }
   ];
+
+  // Handle creating purchase order
+  const handleCreatePO = (item: typeof demandForecast[0]) => {
+    if (suppliers.length === 0) {
+      toast({
+        title: "Error",
+        description: "No suppliers available. Please add a supplier first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Use the first available supplier (in a real app, user would select)
+    const selectedSupplier = suppliers[0];
+    
+    // Calculate expected delivery date (7 days from now)
+    const expectedDate = new Date();
+    expectedDate.setDate(expectedDate.getDate() + 7);
+
+    const newPO = {
+      supplierId: selectedSupplier.id,
+      orderDate: new Date().toISOString().split('T')[0],
+      expectedDate: expectedDate.toISOString().split('T')[0],
+      status: "pending" as const,
+      items: [{
+        brand: item.product.split(' ')[0], // Extract brand from product name
+        model: item.product.split(' ').slice(1).join(' '), // Extract model
+        quantity: item.reorderSuggestion,
+        unitPrice: 50000, // Default price - in real app this would come from product data
+      }],
+      totalAmount: item.reorderSuggestion * 50000
+    };
+
+    addPurchaseOrder(newPO);
+    
+    toast({
+      title: "Success",
+      description: `Purchase order created for ${item.product} (${item.reorderSuggestion} units)`,
+    });
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -204,7 +246,11 @@ const Analytics = () => {
                       <Badge variant="destructive">
                         Reorder {item.reorderSuggestion} units
                       </Badge>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleCreatePO(item)}
+                      >
                         Create PO
                       </Button>
                     </>
