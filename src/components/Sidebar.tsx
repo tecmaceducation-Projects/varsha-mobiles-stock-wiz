@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useSupplier } from "@/contexts/SupplierContext";
 
 interface SidebarProps {
   onLogout: () => void;
@@ -27,13 +28,17 @@ interface SidebarProps {
 const Sidebar = ({ onLogout }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
+  const { purchaseOrders } = useSupplier();
+
+  // Calculate dynamic counts
+  const pendingOrdersCount = purchaseOrders.filter(po => po.status === "pending").length;
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
     { name: "Add Stock", href: "/add-stock", icon: Plus, badge: null },
     { name: "View Inventory", href: "/inventory", icon: Package2, badge: "340" },
     { name: "Suppliers", href: "/suppliers", icon: Users, badge: null },
-    { name: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart, badge: "3" },
+    { name: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart, badge: pendingOrdersCount > 0 ? pendingOrdersCount.toString() : null },
     { name: "Stock Tracking", href: "/stock-tracking", icon: Package, badge: null },
   ];
 
