@@ -101,15 +101,40 @@ const Valuation = () => {
     };
   });
 
-  // Monthly trend simulation (last 6 months)
-  const monthlyTrends = [
-    { month: "Jul", inventory: 950000, sales: 180000, profit: 54000 },
-    { month: "Aug", inventory: 1100000, sales: 220000, profit: 66000 },
-    { month: "Sep", inventory: 1250000, sales: 280000, profit: 84000 },
-    { month: "Oct", inventory: 1180000, sales: 320000, profit: 96000 },
-    { month: "Nov", inventory: 1350000, sales: 380000, profit: 114000 },
-    { month: "Dec", inventory: Math.round(totalInventoryValue), sales: 420000, profit: 126000 }
-  ];
+  // Dynamic trend data based on timeRange
+  const getTrendData = () => {
+    const baseInventory = Math.round(totalInventoryValue);
+    
+    if (timeRange === "weekly") {
+      return [
+        { period: "Week 1", inventory: baseInventory * 0.85, sales: 85000, profit: 25500 },
+        { period: "Week 2", inventory: baseInventory * 0.88, sales: 92000, profit: 27600 },
+        { period: "Week 3", inventory: baseInventory * 0.91, sales: 98000, profit: 29400 },
+        { period: "Week 4", inventory: baseInventory * 0.95, sales: 105000, profit: 31500 },
+        { period: "Week 5", inventory: baseInventory * 0.98, sales: 112000, profit: 33600 },
+        { period: "Week 6", inventory: baseInventory, sales: 120000, profit: 36000 }
+      ];
+    } else if (timeRange === "quarterly") {
+      return [
+        { period: "Q1", inventory: baseInventory * 0.7, sales: 850000, profit: 255000 },
+        { period: "Q2", inventory: baseInventory * 0.82, sales: 1020000, profit: 306000 },
+        { period: "Q3", inventory: baseInventory * 0.91, sales: 1180000, profit: 354000 },
+        { period: "Q4", inventory: baseInventory, sales: 1350000, profit: 405000 }
+      ];
+    } else {
+      // monthly (default)
+      return [
+        { period: "Jul", inventory: baseInventory * 0.75, sales: 180000, profit: 54000 },
+        { period: "Aug", inventory: baseInventory * 0.82, sales: 220000, profit: 66000 },
+        { period: "Sep", inventory: baseInventory * 0.87, sales: 280000, profit: 84000 },
+        { period: "Oct", inventory: baseInventory * 0.91, sales: 320000, profit: 96000 },
+        { period: "Nov", inventory: baseInventory * 0.96, sales: 380000, profit: 114000 },
+        { period: "Dec", inventory: baseInventory, sales: 420000, profit: 126000 }
+      ];
+    }
+  };
+
+  const trendData = getTrendData();
 
   // Top performing models by value
   const topModels = mobileData
@@ -292,9 +317,9 @@ const Valuation = () => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={monthlyTrends}>
+            <AreaChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="period" />
               <YAxis tickFormatter={(value) => `₹${(Number(value)/1000).toFixed(0)}K`} />
               <Tooltip formatter={(value) => `₹${Number(value).toLocaleString()}`} />
               <Legend />
