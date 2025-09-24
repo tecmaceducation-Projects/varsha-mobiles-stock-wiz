@@ -17,6 +17,7 @@ import PurchaseOrders from "@/components/PurchaseOrders";
 import StockTracking from "@/components/StockTracking";
 import Reports from "@/components/Reports";
 import Analytics from "@/components/Analytics";
+import Valuation from "@/components/Valuation";
 import { useInventory } from "@/contexts/InventoryContext";
 
 const queryClient = new QueryClient();
@@ -54,7 +55,7 @@ const AppContent = () => {
         <Route path="/stock-tracking" element={<StockTracking />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/valuation" element={<div className="p-6"><h1 className="text-2xl font-bold">Valuation Report</h1><p className="text-muted-foreground">Detailed valuation coming soon...</p></div>} />
+        <Route path="/valuation" element={<Valuation />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
