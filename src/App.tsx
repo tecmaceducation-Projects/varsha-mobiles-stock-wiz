@@ -73,7 +73,9 @@ const App = () => (
       <BrowserRouter>
         <InventoryProvider>
           <SupplierProvider>
-            <AppContent />
+            <StaffProvider>
+              <AppContent />
+            </StaffProvider>
           </SupplierProvider>
         </InventoryProvider>
       </BrowserRouter>

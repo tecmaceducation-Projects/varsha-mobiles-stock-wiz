@@ -304,9 +304,9 @@ const Reports = () => {
             <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Product</TableHead><TableHead>Type</TableHead><TableHead>Quantity</TableHead><TableHead>Reason</TableHead></TableRow></TableHeader>
             <TableBody>
               {stockMovements.map(movement => (
-                <TableRow key={movement.id}>
+                  <TableRow key={movement.id}>
                   <TableCell>{movement.date}</TableCell>
-                  <TableCell>{movement.product}</TableCell>
+                  <TableCell>{getProductName(movement.productId)}</TableCell>
                   <TableCell><Badge variant={movement.type === "in" ? "default" : "destructive"}>{movement.type === "in" ? "Stock In" : "Stock Out"}</Badge></TableCell>
                   <TableCell>{movement.quantity}</TableCell>
                   <TableCell>{movement.reason}</TableCell>
