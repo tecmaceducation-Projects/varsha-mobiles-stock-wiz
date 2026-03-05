@@ -58,6 +58,7 @@ const AppContent = () => {
         <Route path="/reports" element={<Reports />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/valuation" element={<Valuation />} />
+        <Route path="/staff" element={<StaffManagementPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
