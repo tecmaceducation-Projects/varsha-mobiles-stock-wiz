@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { InventoryProvider } from "@/contexts/InventoryContext";
 import { SupplierProvider } from "@/contexts/SupplierContext";
+import { StaffProvider } from "@/contexts/StaffContext";
 import Login from "@/components/Login";
 import Layout from "@/components/Layout";
 import Dashboard from "@/components/Dashboard";
@@ -18,6 +19,7 @@ import StockTracking from "@/components/StockTracking";
 import Reports from "@/components/Reports";
 import Analytics from "@/components/Analytics";
 import Valuation from "@/components/Valuation";
+import StaffManagementPage from "@/components/StaffManagement";
 import { useInventory } from "@/contexts/InventoryContext";
 
 const queryClient = new QueryClient();
@@ -56,6 +58,7 @@ const AppContent = () => {
         <Route path="/reports" element={<Reports />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/valuation" element={<Valuation />} />
+        <Route path="/staff" element={<StaffManagementPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
@@ -70,7 +73,9 @@ const App = () => (
       <BrowserRouter>
         <InventoryProvider>
           <SupplierProvider>
-            <AppContent />
+            <StaffProvider>
+              <AppContent />
+            </StaffProvider>
           </SupplierProvider>
         </InventoryProvider>
       </BrowserRouter>

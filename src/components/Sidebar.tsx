@@ -49,6 +49,7 @@ const Sidebar = ({ onLogout }: SidebarProps) => {
     { name: "Reports", href: "/reports", icon: FileBarChart, badge: null },
     { name: "Analytics", href: "/analytics", icon: PieChart, badge: "New" },
     { name: "Valuation", href: "/valuation", icon: TrendingUp, badge: null },
+    { name: "Staff & Tasks", href: "/staff", icon: Users, badge: null },
   ];
 
   const getNavClass = (href: string) => {
