@@ -42,6 +42,11 @@ const Reports = () => {
     });
   }, [mobileData, timePeriod]);
 
+  const getProductName = (productId: string) => {
+    const item = mobileData.find(m => m.id === productId);
+    return item ? `${item.brand} ${item.modelName}` : productId;
+  };
+
   const totalStock = filteredData.reduce((sum, item) => sum + (item.quantity || 0), 0);
   const totalValue = filteredData.reduce((sum, item) => sum + ((item.quantity || 0) * item.priceRange), 0);
   const lowStockItems = filteredData.filter(item => (item.quantity || 0) < 10);
