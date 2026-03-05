@@ -276,7 +276,7 @@ const Reports = () => {
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <RechartsPie>
-              <Pie data={segmentData} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={({ name, value }: { name: string; value: number }) => `${name}: ₹${(value / 1000).toFixed(0)}K`}>
+              <Pie data={segmentData} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={(props: any) => `${props.name}: ₹${(props.value / 1000).toFixed(0)}K`}>
                 {segmentData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                 ))}
