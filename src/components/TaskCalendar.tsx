@@ -1,32 +1,33 @@
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useState, useMemo, DragEvent } from "react";
+import { ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle2, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useStaff } from "@/contexts/StaffContext";
+import { useStaff, Task } from "@/contexts/StaffContext";
+import { useToast } from "@/hooks/use-toast";
 
 const TaskCalendar = () => {
-  const { tasks, staff } = useStaff();
+  const { tasks, staff, updateTask } = useStaff();
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [dragOverDate, setDragOverDate] = useState<string | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const monthName = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-
   const getStaffName = (id: string) => staff.find(s => s.id === id)?.name || "Unassigned";
 
   const tasksByDate = useMemo(() => {
-    const map: Record<string, typeof tasks> = {};
+    const map: Record<string, Task[]> = {};
     tasks.forEach(task => {
-      const key = task.dueDate;
-      if (!map[key]) map[key] = [];
-      map[key].push(task);
+      if (!map[task.dueDate]) map[task.dueDate] = [];
+      map[task.dueDate].push(task);
     });
     return map;
   }, [tasks]);
@@ -42,25 +43,74 @@ const TaskCalendar = () => {
     return <span className={`w-1.5 h-1.5 rounded-full ${color} shrink-0`} />;
   };
 
+  // Drag handlers
+  const handleDragStart = (e: DragEvent, task: Task) => {
+    setDraggedTask(task);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", task.id);
+  };
+
+  const handleDragOver = (e: DragEvent, dateStr: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverDate(dateStr);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverDate(null);
+  };
+
+  const handleDrop = (e: DragEvent, dateStr: string) => {
+    e.preventDefault();
+    setDragOverDate(null);
+    if (draggedTask && draggedTask.dueDate !== dateStr) {
+      updateTask(draggedTask.id, { dueDate: dateStr });
+      toast({
+        title: "Task Rescheduled",
+        description: `"${draggedTask.title}" moved to ${dateStr}`,
+      });
+    }
+    setDraggedTask(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedTask(null);
+    setDragOverDate(null);
+  };
+
   const days = [];
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Empty cells for days before the first day
   for (let i = 0; i < firstDayOfMonth; i++) {
-    days.push(<div key={`empty-${i}`} className="min-h-[100px] bg-muted/30 rounded-lg" />);
+    const emptyDateStr = `empty-${i}`;
+    days.push(
+      <div
+        key={emptyDateStr}
+        className="min-h-[100px] bg-muted/30 rounded-lg"
+        onDragOver={(e) => e.preventDefault()}
+      />
+    );
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     const dayTasks = tasksByDate[dateStr] || [];
     const isToday = new Date().toISOString().split("T")[0] === dateStr;
+    const isDragOver = dragOverDate === dateStr;
 
     days.push(
       <div
         key={day}
-        className={`min-h-[100px] rounded-lg border p-1.5 transition-smooth ${
-          isToday ? "border-primary bg-primary/5" : "border-border bg-card"
+        className={`min-h-[100px] rounded-lg border p-1.5 transition-all duration-200 ${
+          isDragOver
+            ? "border-primary border-dashed bg-primary/10 scale-[1.02]"
+            : isToday
+            ? "border-primary bg-primary/5"
+            : "border-border bg-card"
         }`}
+        onDragOver={(e) => handleDragOver(e, dateStr)}
+        onDragLeave={handleDragLeave}
+        onDrop={(e) => handleDrop(e, dateStr)}
       >
         <div className={`text-xs font-semibold mb-1 ${isToday ? "text-primary" : "text-foreground"}`}>
           {day}
@@ -69,8 +119,16 @@ const TaskCalendar = () => {
           {dayTasks.slice(0, 3).map(task => (
             <div
               key={task.id}
-              className="flex items-center gap-1 text-[10px] p-1 rounded bg-secondary/50 leading-tight"
+              draggable
+              onDragStart={(e) => handleDragStart(e, task)}
+              onDragEnd={handleDragEnd}
+              className={`flex items-center gap-1 text-[10px] p-1 rounded leading-tight cursor-grab active:cursor-grabbing select-none transition-all ${
+                draggedTask?.id === task.id
+                  ? "opacity-40 bg-primary/20"
+                  : "bg-secondary/50 hover:bg-secondary/80 hover:shadow-sm"
+              }`}
             >
+              <GripVertical className="w-2.5 h-2.5 text-muted-foreground shrink-0" />
               {priorityDot(task.priority)}
               {statusIcon(task.status)}
               <span className="truncate">{task.title}</span>
@@ -84,7 +142,6 @@ const TaskCalendar = () => {
     );
   }
 
-  // Today's & upcoming tasks sidebar
   const today = new Date().toISOString().split("T")[0];
   const upcomingTasks = tasks
     .filter(t => t.dueDate >= today && t.status !== "completed")
@@ -94,7 +151,6 @@ const TaskCalendar = () => {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
-        {/* Calendar Grid */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <Button variant="ghost" size="icon" onClick={prevMonth}>
@@ -106,6 +162,7 @@ const TaskCalendar = () => {
             </Button>
           </CardHeader>
           <CardContent>
+            <p className="text-xs text-muted-foreground mb-2">💡 Drag and drop tasks between dates to reschedule</p>
             <div className="grid grid-cols-7 gap-1 mb-1">
               {weekDays.map(d => (
                 <div key={d} className="text-center text-xs font-medium text-muted-foreground py-1">{d}</div>
@@ -115,7 +172,6 @@ const TaskCalendar = () => {
           </CardContent>
         </Card>
 
-        {/* Upcoming Tasks */}
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">Upcoming Tasks</CardTitle>
