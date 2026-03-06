@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit, Trash2, Users, UserCheck, UserX, ClipboardList, CalendarDays, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Users, UserCheck, UserX, ClipboardList, CalendarDays, CheckCircle2, Clock, AlertCircle, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useStaff } from "@/contexts/StaffContext";
 import { useToast } from "@/hooks/use-toast";
+import TaskCalendar from "@/components/TaskCalendar";
 
 const StaffManagement = () => {
   const { staff, tasks, addStaff, updateStaff, deleteStaff, addTask, updateTask, deleteTask } = useStaff();
