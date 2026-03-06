@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useInventory } from "@/contexts/InventoryContext";
 import { useSupplier } from "@/contexts/SupplierContext";
 import { useToast } from "@/hooks/use-toast";
+import { exportToCSV, exportToPDF } from "@/lib/exportUtils";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart as RechartsPie, Pie, Cell, Legend, LineChart, Line, Area, AreaChart,
