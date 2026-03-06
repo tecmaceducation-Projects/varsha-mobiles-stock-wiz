@@ -243,6 +243,11 @@ const StaffManagement = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Calendar Tab */}
+        <TabsContent value="calendar">
+          <TaskCalendar />
+        </TabsContent>
       </Tabs>
     </div>
   );
