@@ -93,6 +93,7 @@ const StaffManagement = () => {
         <TabsList>
           <TabsTrigger value="staff"><Users className="w-4 h-4 mr-2" />Staff Directory</TabsTrigger>
           <TabsTrigger value="tasks"><ClipboardList className="w-4 h-4 mr-2" />Task Board</TabsTrigger>
+          <TabsTrigger value="calendar"><CalendarRange className="w-4 h-4 mr-2" />Calendar</TabsTrigger>
         </TabsList>
 
         {/* Staff Tab */}
