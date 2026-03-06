@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit, Trash2, Users, UserCheck, UserX, ClipboardList, CalendarDays, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Users, UserCheck, UserX, ClipboardList, CalendarDays, CheckCircle2, Clock, AlertCircle, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useStaff } from "@/contexts/StaffContext";
 import { useToast } from "@/hooks/use-toast";
+import TaskCalendar from "@/components/TaskCalendar";
 
 const StaffManagement = () => {
   const { staff, tasks, addStaff, updateStaff, deleteStaff, addTask, updateTask, deleteTask } = useStaff();
@@ -92,6 +93,7 @@ const StaffManagement = () => {
         <TabsList>
           <TabsTrigger value="staff"><Users className="w-4 h-4 mr-2" />Staff Directory</TabsTrigger>
           <TabsTrigger value="tasks"><ClipboardList className="w-4 h-4 mr-2" />Task Board</TabsTrigger>
+          <TabsTrigger value="calendar"><CalendarRange className="w-4 h-4 mr-2" />Calendar</TabsTrigger>
         </TabsList>
 
         {/* Staff Tab */}
@@ -240,6 +242,11 @@ const StaffManagement = () => {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Calendar Tab */}
+        <TabsContent value="calendar">
+          <TaskCalendar />
         </TabsContent>
       </Tabs>
     </div>
