@@ -78,10 +78,52 @@ const Reports = () => {
   }));
 
   const handleExport = (format: string) => {
-    toast({ title: "Export Started", description: `Generating ${format.toUpperCase()} report...` });
-    setTimeout(() => {
-      toast({ title: "Export Complete", description: `Report exported successfully in ${format.toUpperCase()} format!` });
-    }, 2000);
+    try {
+      if (format === "excel") {
+        if (reportType === "inventory") {
+          exportToCSV(
+            filteredData.map(item => ({
+              Brand: item.brand, Model: item.modelName, Quantity: item.quantity || 0,
+              Price: item.priceRange, Value: (item.quantity || 0) * item.priceRange,
+            })),
+            `Inventory_Report_${timePeriod}`
+          );
+        } else if (reportType === "purchase") {
+          exportToCSV(
+            purchaseOrders.map(po => {
+              const sup = suppliers.find(s => s.id === po.supplierId);
+              return { Supplier: sup?.company || po.supplierId, Amount: po.totalAmount, Status: po.status, Date: po.orderDate };
+            }),
+            `Purchase_Report_${timePeriod}`
+          );
+        } else if (reportType === "movement") {
+          exportToCSV(
+            stockMovements.map(m => ({
+              Date: m.date, Product: getProductName(m.productId), Type: m.type, Quantity: m.quantity, Reason: m.reason,
+            })),
+            `Stock_Movement_Report`
+          );
+        } else {
+          exportToCSV(
+            Object.entries(brandStats).map(([brand, stats]) => ({
+              Brand: brand, Models: stats.count, Quantity: stats.quantity, Value: stats.value,
+            })),
+            `Valuation_Report`
+          );
+        }
+      } else {
+        const sections = reportType === "inventory"
+          ? [{ heading: "Inventory Summary", rows: [["Total Items", String(filteredData.length)], ["Total Stock", String(totalStock)], ["Total Value", `₹${totalValue.toLocaleString()}`], ["Low Stock Items", String(lowStockItems.length)]] },
+             { heading: "Brand Analysis", rows: Object.entries(brandStats).map(([brand, s]) => [brand, `${s.count} models`, `${s.quantity} units`, `₹${s.value.toLocaleString()}`]) }]
+          : reportType === "purchase"
+          ? [{ heading: "Purchase Summary", rows: [["Total Orders", String(purchaseOrders.length)], ["Total Value", `₹${purchaseOrders.reduce((s, p) => s + p.totalAmount, 0).toLocaleString()}`]] }]
+          : [{ heading: "Stock Summary", rows: [["Total Value", `₹${totalValue.toLocaleString()}`]] }];
+        exportToPDF(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`, sections);
+      }
+      toast({ title: "Export Complete", description: `${format.toUpperCase()} report downloaded successfully!` });
+    } catch {
+      toast({ title: "Export Failed", description: "Could not generate the report file.", variant: "destructive" });
+    }
   };
 
   const renderInventoryReport = () => (
